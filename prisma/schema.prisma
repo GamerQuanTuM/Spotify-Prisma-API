@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String     @id @default(uuid())
+  email          String     @unique
+  password       String
+  name           String
+  gender         Gender?
+  likedPlaylists Playlist[]
+  likedSongs     Song[]
+  image          String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+model Playlist {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  songs       Song[]
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  image       String?
+  isAdmin     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Song {
+  id        String     @id @default(uuid())
+  title     String
+  artist    String
+  album     String
+  playlists Playlist[]
+  likedBy   User[]
+  image     String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
