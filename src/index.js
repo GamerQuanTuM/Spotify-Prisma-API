@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 import express from "express";
 import { createServer } from "http";
 import cors from "cors";
-import userRouter from "./auth/auth.router.js";
+import authRouter from "./auth/auth.router.js";
 
 dotenv.config();
 
@@ -16,7 +16,7 @@ const server = createServer(app);
 
 app.use(cors());
 app.use(express.json());
-app.use("/api/v1/user", userRouter);
+app.use("/api/v1/user", authRouter);
 
 app.get("/", (_, res) => {
   res.status(200).json({ message: "Welcome To Spotify API" });
