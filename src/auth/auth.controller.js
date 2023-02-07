@@ -2,8 +2,10 @@ import bcrypt from "bcryptjs";
 import { validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
+import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 
-const prisma = new PrismaClient({log:['query']});
+const prisma = new PrismaClient({ log: ["query"] });
 
 export const register = async (req, res) => {
   const errors = validationResult(req);
@@ -11,7 +13,22 @@ export const register = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { name, email, password,gender } = req.body;
+  const { name, email, password, gender } = req.body;
+
+  const files = req.files.image.tempFilePath;
+
+  const result = await cloudinary.uploader.upload(
+    files,
+    {
+      folder: "spotify",
+    },
+    (err, result) => {
+      if (err) {
+        res.status(400).json("Something went wrong");
+      }
+    }
+  );
+  fs.unlinkSync(files);
 
   try {
     let user = await prisma.user.findFirst({ where: { email } });
@@ -27,11 +44,13 @@ export const register = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        gender
+        gender,
+        image: result.url,
       },
       select: {
         name: true,
         email: true,
+        image: true,
       },
     });
 
@@ -68,7 +87,7 @@ export const login = async (req, res) => {
     const user = await prisma.user.findFirst({
       where: {
         email,
-      }
+      },
     });
 
     if (!user) {
@@ -94,7 +113,7 @@ export const login = async (req, res) => {
       (err, token) => {
         if (err) throw err;
         const { email, name } = user;
-        res.status(200).json({ token, user:{email,name} });
+        res.status(200).json({ token, user: { email, name } });
       }
     );
   } catch (err) {
