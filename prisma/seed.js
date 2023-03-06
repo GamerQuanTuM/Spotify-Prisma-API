@@ -11,7 +11,7 @@ async function seed() {
         email: "johndoeexample.com",
         password: "john@010",
         gender: Gender.MALE,
-        image: "Image",
+        // image: "Image",
         likedPlaylists: {
           create: [
             { title: "Johns favorite playlists", description: "Desc 1" },
@@ -38,6 +38,7 @@ async function seed() {
         likedBy: {
           connect: [{ id: users[0].id }],
         },
+
       },
     }),
   ]);

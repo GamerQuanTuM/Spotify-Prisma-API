@@ -1,6 +1,6 @@
 import express from "express";
 import { check } from "express-validator";
-import { login, register } from "./auth.controller.js";
+import { getUser, login, register } from "./auth.controller.js";
 
 const router = express.Router();
 
@@ -22,5 +22,7 @@ router.post(
   [check("email").isEmail(), check("password").isLength({ min: 6 })],
   login
 );
+
+router.get("/:email", getUser);
 
 export default router;

@@ -2,8 +2,8 @@ import bcrypt from "bcryptjs";
 import { validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
-import { v2 as cloudinary } from "cloudinary";
-import fs from "fs";
+// import { v2 as cloudinary } from "cloudinary";
+// import fs from "fs";
 
 const prisma = new PrismaClient({ log: ["query"] });
 
@@ -15,20 +15,26 @@ export const register = async (req, res) => {
 
   const { name, email, password, gender } = req.body;
 
-  const files = req.files.image.tempFilePath;
+  // let files = req?.files?.image?.tempFilePath;
 
-  const result = await cloudinary.uploader.upload(
-    files,
-    {
-      folder: "spotify",
-    },
-    (err, result) => {
-      if (err) {
-        res.status(400).json("Something went wrong");
-      }
-    }
-  );
-  fs.unlinkSync(files);
+  // if (!files) {
+  //   res.status(400).json("Image is required");
+  // }
+
+  // const result = await cloudinary.uploader.upload(
+  //   files,
+  //   {
+  //     folder: "spotify",
+  //     use_filename: true,
+  //     resource_type: "image",
+  //   },
+  //   (err, result) => {
+  //     if (err) {
+  //       res.status(400).json(err);
+  //     }
+  //   }
+  // );
+  // fs.unlinkSync(files);
 
   try {
     let user = await prisma.user.findFirst({ where: { email } });
@@ -45,12 +51,12 @@ export const register = async (req, res) => {
         email,
         password: hashedPassword,
         gender,
-        image: result.url,
+        // image: result?.url,
       },
       select: {
         name: true,
         email: true,
-        image: true,
+        // image: true,
       },
     });
 
@@ -119,5 +125,23 @@ export const login = async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
+  }
+};
+
+export const getUser = async (req, res) => {
+  try {
+    const email = req.params.email;
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+      select: {
+        email: true,
+      },
+    });
+    res.status(200).json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error getting user data" });
   }
 };

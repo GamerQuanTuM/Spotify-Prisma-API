@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "prisma":"npx prisma studio"
   },
   "prisma": {
     "seed": "node -r esbuild-register prisma/seed.js"
@@ -15,7 +16,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^4.9.0",
+    "@prisma/client": "^4.11.0",
+    "@sanity/client": "^5.2.2",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.33.0",
     "cors": "^2.8.5",
